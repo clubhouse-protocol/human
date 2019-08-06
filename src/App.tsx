@@ -1,8 +1,10 @@
+import './platform/setup';
 import React from 'react';
 import Transporter from 'clubhouse-protocol/build/babel/Transporter';
-import { Provider } from './useData';
+import { Provider } from './hooks/useData';
+import { Provider as DBProvider } from './hooks/useDB';
 import Router from './screens/Router';
-import db from './db/index.web';
+import db from './db';
 
 class AppTransporter implements Transporter {
   private _data: {[name: string]: string} = {};
@@ -21,8 +23,10 @@ const transporter = new AppTransporter();
 
 export default function App() {
   return (
-    <Provider db={db} transporter={transporter}>
-      <Router />
-    </Provider>
+    <DBProvider>
+      <Provider db={db} transporter={transporter}>
+        <Router />
+      </Provider>
+    </DBProvider>
   );
 }

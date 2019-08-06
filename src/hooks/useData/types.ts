@@ -9,7 +9,7 @@ enum LoadState {
   LOADED = 'LOADED',
 }
 
-interface ContextType {
+export interface ContextType {
   status: LoadState;
   identity?: Identity;
   channels?: {[name: string]: Channel};
@@ -27,7 +27,6 @@ interface Props {
 
 export {
   LoadState,
-  ContextType,
   Props,
   SetData,
 };

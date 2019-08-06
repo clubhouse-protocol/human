@@ -1,9 +1,9 @@
 import { IMessage } from 'react-native-gifted-chat';
-import { Message } from 'clubhouse-protocol/build/babel/Identity';
+import { Message, MessageType } from '../../db/db';
 
-const parseMessage = (message: Error | Message<any>, index: number): IMessage => {
+const parseMessage = (message: Message): IMessage => {
   const result: IMessage = {
-    _id: index,
+    _id: message.id,
     createdAt: new Date(),
     text: 'unknown',
     user: {
@@ -17,9 +17,7 @@ const parseMessage = (message: Error | Message<any>, index: number): IMessage =>
     return result;
   }
   result.system = false;
-  result.user._id = message.sender.fingerprint;
-  result.user.name = message.sender.fingerprint;
-  if (message.data.type === 'message') {
+  if (message.type === MessageType.MESSAGE) {
     result.text = message.data.text;
   }
 

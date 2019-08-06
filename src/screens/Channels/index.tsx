@@ -1,8 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, Fragment } from 'react';
 import styled from 'styled-components/native';
 import { FlatList } from 'react-native';
 import { withNavigation, NavigationInjectedProps, NavigationParams } from 'react-navigation';
-import useData from '../../useData';
+import useChannels from '../../hooks/useChannels';
 
 const Wrapper = styled.TouchableOpacity`
 `;
@@ -10,30 +10,35 @@ const Wrapper = styled.TouchableOpacity`
 const Name = styled.Text`
 `;
 
+const Button = styled.Button`
+`;
+
 const Channels: FunctionComponent<NavigationInjectedProps<NavigationParams>> = ({
   navigation,
 }) => {
-  const data = useData();
-  const channels = data.channels ? Object.keys(data.channels) : [];
+  const { channels, addChannel } = useChannels();
 
   return (
-    <FlatList
-      data={channels}
-      renderItem={({ item }) => (
-        <Wrapper
-          onPress={() => {
-            navigation.navigate({
-              routeName: 'Channel',
-              params: {
-                name: item,
-              },
-            });
-          }}
-        >
-          <Name>{item}</Name>
-        </Wrapper>
-      )}
-    />
+    <Fragment>
+      <Button title="Add" onPress={() => { addChannel('test') }} />
+      <FlatList
+        data={channels}
+        renderItem={({ item }) => (
+          <Wrapper
+            onPress={() => {
+              navigation.navigate({
+                routeName: 'Channel',
+                params: {
+                  name: item.name,
+                },
+              });
+            }}
+          >
+            <Name>{item.name}</Name>
+          </Wrapper>
+        )}
+      />
+    </Fragment>
   );
 };
 

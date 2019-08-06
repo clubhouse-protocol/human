@@ -2,28 +2,27 @@ import React, { FunctionComponent, useState, useEffect } from 'react';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import styled from 'styled-components/native';
 import { Platform, Dimensions } from 'react-native';
-import useChannel, { Provider } from '../../useChannel';
 import parseMessage from './parseMessage';
+import { NavigationInjectedProps, NavigationParams } from 'react-navigation';
+import useMessages from '../../hooks/useMessages';
 
 const HeaderHeight = 64;
 const Wrapper = styled.View`
   ${() => (Platform.OS === 'web' ? `min-height: ${Dimensions.get('window').height - HeaderHeight}px;` : '')}
 `;
 
-const ChannelUnbound: FunctionComponent = () => {
+const Channel: FunctionComponent<NavigationInjectedProps<NavigationParams>> = ({
+  navigation,
+}) => {
   const [text, setText] = useState();
-  const channel = useChannel();
-  if (!channel) {
-    return null;
-  }
-  const { messages, send, update } = channel;
+  const { messages, sendMessage, update } = useMessages(navigation.getParam('name'));
 
   useEffect(() => {
-    // update();
-  });
+    update();
+  }, []);
 
   const sendMsg = async () => {
-    await send(text);
+    await sendMessage(text);
   };
 
   return (
@@ -41,11 +40,5 @@ const ChannelUnbound: FunctionComponent = () => {
     </Wrapper>
   );
 };
-
-const Channel: FunctionComponent = () => (
-  <Provider name="test">
-    <ChannelUnbound />
-  </Provider>
-);
 
 export default Channel;

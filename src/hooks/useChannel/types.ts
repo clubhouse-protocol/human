@@ -1,7 +1,7 @@
 import { Channel } from 'clubhouse-protocol';
 import { ReactNode } from 'react';
 
-interface ContextType {
+export interface ContextType {
   channel: Channel;
   update: () => Promise<any>
   name: string;
@@ -15,6 +15,5 @@ interface Props {
 }
 
 export {
-  ContextType,
   Props,
 };

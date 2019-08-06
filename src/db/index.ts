@@ -1,4 +1,4 @@
-import DB from '../useData/DB';
+import DB from '../hooks/useData/DB';
 
 const db: DB = {
   getIdentityKey: async () => localStorage.getItem('__id_key'),
