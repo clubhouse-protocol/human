@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "clubhouse-protocol": "^1.0.0-alpha.6",
+    "clubhouse-protocol-transporter-socket": "^1.0.0-alpha.1",
     "expo": "^34.0.1",
     "pouchdb-adapter-asyncstorage": "^6.4.1",
     "pouchdb-adapter-idb": "^7.1.1",

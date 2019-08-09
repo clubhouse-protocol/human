@@ -1,11 +1,12 @@
 import useDB from "./useDB";
 
 const useChannels = () => {
-  const { channels, addChannel } = useDB();
+  const { channels, addChannel, loadChannel } = useDB();
 
   return {
     channels,
-    addChannel
+    addChannel,
+    loadChannel,
   };
 };
 

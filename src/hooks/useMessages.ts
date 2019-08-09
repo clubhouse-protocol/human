@@ -11,7 +11,7 @@ const useMessages = (channelName : string) => {
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
-    const subscription = db.messages.find({}).$.subscribe((documents) => {
+    const subscription = db.messages.find({}).sort({ 'received': 'desc' }).$.subscribe((documents) => {
       setMessages(documents.map(message => message.toJSON()))
     });
 

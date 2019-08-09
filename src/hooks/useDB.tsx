@@ -5,19 +5,6 @@ import { createIdentity, loadIdentity, Identity, loadChannel, Channel, createCha
 import Transporter from 'clubhouse-protocol/build/babel/Transporter';
 import { Message } from 'clubhouse-protocol/build/babel/Identity';
 
-class AppTransporter implements Transporter {
-  private _data: {[name: string]: string} = {};
-
-  async get(id) {
-    return localStorage.getItem(`msg_${id}`);
-  }
-
-  async add(id, value) {
-    console.log('save', id, value);
-    localStorage.setItem(`msg_${id}`, value);
-  }
-}
-
 interface ChannelType {
   name: string;
   channel: Channel;
@@ -28,6 +15,7 @@ interface ContextType {
   identity: Identity;
   channels: ChannelType[];
   addChannel: (name: string) => Promise<void>;
+  loadChannel: (name: string, senderKey: string, channelKey: string) => Promise<void>;
 }
 
 const context = createContext<ContextType>(undefined);
@@ -57,7 +45,11 @@ const setupChannels = async (db: DBType, identity: Identity, transporter: Transp
   const documents = await db.channels.find().exec();
   const tasks = documents.map(async (document) => {
     const channel = await loadChannel(identity, document.key, transporter);
-    channel.on('message', async (msg: Error | Message<any>) => {
+    channel.startAutoUpdate();
+    channel.on('messageError', (err) => {
+      console.log('err', err);
+    });
+    channel.on('message', async (msg: Error | Message<any> & { id: string }) => {
       if (msg instanceof Error) {
         await db.messages.insert({
           id: msg.message,
@@ -76,12 +68,12 @@ const setupChannels = async (db: DBType, identity: Identity, transporter: Transp
         return;
       }
       await db.messages.insert({
-        id,
+        id: msg.id || id,
         received: new Date().getTime(),
         type: MessageType.MESSAGE,
         sender: msg.sender.fingerprint,
         data: {
-          text: msg.data.text,
+          ...msg.data,
         },
       });
     });
@@ -98,8 +90,8 @@ const Provider: FunctionComponent<{
   transporter: Transporter;
 }> = ({
   children,
+  transporter,
 }) => {
-  const [transporter] = useState(new AppTransporter());
   const [db, setDB] = useState<DBType>(undefined);
   const [identity, setIdentity] = useState<Identity>(undefined);
   const [channels, setChannels] = useState<ChannelType[]>(undefined);
@@ -129,6 +121,20 @@ const Provider: FunctionComponent<{
     });
   };
 
+  const loadChannelI = async (name: string, senderKey: string, channelKey: string) => {
+    const sender = await loadIdentity(senderKey);
+    const channel = await loadChannel(identity, channelKey, transporter, sender);
+    const packedKey = await channel.pack(identity)
+    await db.channels.insert({
+      id: name,
+      key: packedKey,
+    });
+    setChannels({
+      ...channels,
+      [name]: channel,
+    });
+  };
+
   return (
     <ContextProvider
       value={{
@@ -136,6 +142,7 @@ const Provider: FunctionComponent<{
         identity,
         channels,
         addChannel,
+        loadChannel: loadChannelI,
       }}
     >
       {db && children}

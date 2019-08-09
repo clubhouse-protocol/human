@@ -31,6 +31,7 @@ const message: RxDB.RxJsonSchema<Message> = {
     },
     received: {
       type: 'number',
+      index: true,
     },
     data: {
       type: 'object',

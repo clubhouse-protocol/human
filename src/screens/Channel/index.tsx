@@ -5,8 +5,9 @@ import { Platform, Dimensions } from 'react-native';
 import parseMessage from './parseMessage';
 import { NavigationInjectedProps, NavigationParams } from 'react-navigation';
 import useMessages from '../../hooks/useMessages';
+import useIdentity from '../../hooks/useIdentity';
 
-const HeaderHeight = 64;
+const HeaderHeight = 128;
 const Wrapper = styled.View`
   ${() => (Platform.OS === 'web' ? `min-height: ${Dimensions.get('window').height - HeaderHeight}px;` : '')}
 `;
@@ -15,6 +16,7 @@ const Channel: FunctionComponent<NavigationInjectedProps<NavigationParams>> = ({
   navigation,
 }) => {
   const [text, setText] = useState();
+  const idenity = useIdentity();
   const { messages, sendMessage, update } = useMessages(navigation.getParam('name'));
 
   useEffect(() => {
@@ -34,7 +36,7 @@ const Channel: FunctionComponent<NavigationInjectedProps<NavigationParams>> = ({
         onSend={() => sendMsg()}
         placeholder="Type a message"
         user={{
-          _id: 1,
+          _id: idenity.fingerprint,
         }}
       />
     </Wrapper>

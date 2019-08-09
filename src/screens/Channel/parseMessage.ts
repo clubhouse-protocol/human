@@ -4,10 +4,10 @@ import { Message, MessageType } from '../../db/db';
 const parseMessage = (message: Message): IMessage => {
   const result: IMessage = {
     _id: message.id,
-    createdAt: new Date(),
+    createdAt: new Date(message.received),
     text: 'unknown',
     user: {
-      _id: 1,
+      _id: message.sender || 'system',
     },
     system: true,
   };
