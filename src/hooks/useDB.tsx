@@ -45,37 +45,55 @@ const setupChannels = async (db: DBType, identity: Identity, transporter: Transp
   const documents = await db.channels.find().exec();
   const tasks = documents.map(async (document) => {
     const channel = await loadChannel(identity, document.key, transporter);
+    const update = async () => {
+      console.log('updated!1');
+      const pack = await channel.pack();
+      const entry = await db.channels.findOne({ id: document.id }).exec();
+      await entry.update({
+        $set: {
+          key: pack,
+        },
+      });
+      console.log('updated!');
+    }
     channel.startAutoUpdate();
     channel.on('messageError', (err) => {
       console.log('err', err);
     });
     channel.on('message', async (msg: Error | Message<any> & { id: string }) => {
       if (msg instanceof Error) {
-        await db.messages.insert({
+        /*await db.messages.insert({
           id: msg.message,
           received: new Date().getTime(),
           type: MessageType.ERROR,
           sender: 'system',
+          channel: document.id,
           data: {
             text: msg.message,
           },
-        });
+        });*/
+        await update();
         return;
       }
       const id = `${msg.sender.fingerprint}-${msg.data.text}`;
-      const exists = await db.messages.findOne({ id }).exec();
+      const exists = await db.messages.findOne({ id: msg.id }).exec();
       if (exists) {
+
+        console.log('existed')
         return;
       }
+      console.log('save', exists, msg.id)
       await db.messages.insert({
         id: msg.id || id,
         received: new Date().getTime(),
         type: MessageType.MESSAGE,
+        channel: document.id,
         sender: msg.sender.fingerprint,
         data: {
           ...msg.data,
         },
       });
+      await update();
     });
     return {
       name: document.id,

@@ -6,7 +6,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "build:web": "expo build:web"
+    "build:web": "expo build:web",
+    "dev": "npm run web"
   },
   "dependencies": {
     "clubhouse-protocol": "^1.0.0-alpha.6",

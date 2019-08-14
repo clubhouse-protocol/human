@@ -11,6 +11,7 @@ interface Message<Type = any> {
   received: number;
   sender?: string;
   data: Type;
+  channel: string;
 }
 
 const message: RxDB.RxJsonSchema<Message> = {
@@ -25,6 +26,9 @@ const message: RxDB.RxJsonSchema<Message> = {
     type: {
       type: 'string',
       enum: Object.keys(MessageType),
+    },
+    channel: {
+      type: 'string',
     },
     sender: {
       type: 'string',
