@@ -22,7 +22,7 @@
     "react-native-reanimated": "1.1.0",
     "react-native-web": "0.11.5",
     "react-navigation": "3.11.1",
-    "rxdb": "8.3.0",
+    "rxdb": "11.0.0",
     "rxjs": "6.5.2",
     "styled-components": "5.0.0-beta.6-ej4"
   },
